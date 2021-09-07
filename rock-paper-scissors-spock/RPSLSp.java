@@ -14,8 +14,17 @@ public class RPSLSp {
     public static int[][] gameOutcomes = {}; // * the results of the games overall
     public static String[][] gameVerbs = {}; // * the verbs that are used for each battle
     public static ArrayList<Integer> gameTally = new ArrayList<Integer>(); // * the results of the games tallied (+1 for the user, -1 for the computer, and 0 for tie)
+    /**
+     * Example gameRules setup
+     * gameChoices = [rock,paper,scissors]
+     * gameRules = [
+     *      [0,0,1] rock beats scissors
+     *      [1,0,0] paper beats rock
+     *      [0,1,0] scissors beats paper
+     * ]
+     */
     public static int[][] gameRules = {}; // * the rules of the game that need to be defined using the battle files 
-    
+
     // * current variables
     public static String currentWeaponUser = "";
     public static String currentWeaponComp = "";
@@ -30,15 +39,6 @@ public class RPSLSp {
 
 
 
-    /**
-     * Example gameRules setup
-     * gameChoices = [rock,paper,scissors]
-     * gameRules = [
-     *      [0,0,1] rock beats scissors
-     *      [1,0,0] paper beats rock
-     *      [0,1,0] scissors beats paper
-     * ]
-     */
 
 
     /**
@@ -73,8 +73,6 @@ public class RPSLSp {
             currentVictor = "User";
             gameTally.add(1);
             System.out.println("User (" + currentWeaponUser +") "+ gameVerbs[userSelection][computerSelection] +" Computer (" + currentWeaponComp +")");
-
-            // System.out.println("User (rock) crushes Computer (scissors)");
         } else if (gameRules[computerSelection][userSelection] == 1) {
             // * computer has won
             currentVictor = "Computer";
@@ -108,10 +106,14 @@ public class RPSLSp {
         String numReturn = sc.nextLine();
         try{
             int userVal = Integer.parseInt(numReturn);
+            if ( 0 < userVal && userVal > gameChoices.length) {
+                // ! The user has entered a val outside the limits
+                throw new NumberFormatException("Error: your must enter a number 1-5, you entered a number greater than 5 or less than 1");
+            }
             return userVal;
         }
-        catch (NumberFormatException error) { // TODO: handle out of bounds number exception
-            throw new NumberFormatException("Error: your must enter a number 1-5");
+        catch (NumberFormatException error) {
+            throw new NumberFormatException("Error: your must enter a number 1-5, you did not enter a number");
 
         }
         catch (Exception error) {
@@ -154,8 +156,6 @@ public class RPSLSp {
         while (sc.hasNextLine()) {
             lineCount++;
             String data = sc.nextLine();
-            // System.out.println("data: " + data);
-            // System.out.println("lineCount: " + lineCount);
 
             if (lineCount == 1) {
                 // * get val for choicesLength
@@ -164,10 +164,7 @@ public class RPSLSp {
                     gameChoices = new String[choicesLength];
                     userWeaponsTally = new int[choicesLength];
                     compWeaponsTally = new int[choicesLength];
-
-                    // System.out.println("choicesLen: " + choicesLength);
                 } catch (Exception e) {
-                    // System.out.println(e);
                     throw new NumberFormatException("Error: Should be a number -- problem with file");
                 }
             }
@@ -183,16 +180,21 @@ public class RPSLSp {
                 gameVerbs = new String[choicesLength][choicesLength];
             }
             if (lineCount != 1 && lineCount != 2) {
+
+                int lineShouldBe = choicesLength * choicesLength+ 2; // * length the file should be
+                if (lineCount > lineShouldBe) { 
+                    // ! error because of filesize
+                    throw new Error("Error: There is something wrong with the file -- too long/short");
+                }
+
                 // * rest of lines define rules to game
                 String[] ruleBase = data.split(":"); // * splits string into init val and battle vals
                 String ruleInit = ruleBase[0];
                 String[] ruleBattles = ruleBase[1].split(" ");
-                // System.out.println("ruleInit: " + ruleInit);
-                // System.out.println("ruleBattlesArr: " + Arrays.toString(ruleBattles));
+
                 
                 // * converts names to ints for array positioning
                 int ruleInitVal = convertNametoNum(ruleInit);
-                // System.out.println("ruleBattle len: " + ruleBattles.length);
 
                 // * set 1's and 0's for rule val
                 if (ruleBattles.length == 3) {
@@ -203,14 +205,19 @@ public class RPSLSp {
                     // * there is a winner + verb
                     if (ruleCorrespValB == ruleInitVal) {
                         // * init won
+                        if (gameRules[ruleInitVal][ruleCorrespValA] == 1) {
+                            // ! error it has already gone through this one
+                            throw new Error("Error: There is a duplicate set of wins/losses in the file.");
+                        }
+
                         gameRules[ruleInitVal][ruleCorrespValA] = 1; // * init wins
                     } else {
+                        // ! possible issue: it will not detect extra copies of ties in file
                         gameRules[ruleInitVal][ruleCorrespValA] = 0; // * init loses
                     }
                 } else if (ruleBattles.length == 2) {
                     // * this is a tie
                     int ruleCorrespVal = convertNametoNum(ruleBattles[0]); //* ruleBattles[1] is tie
-                    // gameVerbs.add("n/a");
                     gameVerbs[ruleInitVal][ruleCorrespVal] = "n/a"; // * verbs don't exist for ties
                     gameRules[ruleInitVal][ruleCorrespVal] = 0;
 
@@ -218,8 +225,6 @@ public class RPSLSp {
                     System.err.println("some kind of error that doesn't make sense in getFile()");
                 }
 
-                // System.out.println(Arrays.toString(gameChoices));
-                // print2d(gameRules);
             }
 
         }
@@ -231,14 +236,11 @@ public class RPSLSp {
      * Converts the name of a weapon into a number corresponding to it
      */
     public static int convertNametoNum(String name) {
-        // System.out.println("name:" + name);
-        // System.out.println("gameChoices: " + Arrays.toString(gameChoices));
         name = name.replaceAll("\\s", "");
         int retval = -1;
         for (int i = 0; i < gameChoices.length; i++) {
             String gc = gameChoices[i].replaceAll("\\s", "");
             // * was having issues with if statement name equal gc, thought there was something wrong with my compiler until I found this: https://stackoverflow.com/questions/14696054/while-loop-in-java-string-comparison-does-not-work
-            // System.out.println(new String(name) + new String(gc));
             if (new String(name).equals(gc)) {
                 retval =  i;
             }
@@ -289,7 +291,7 @@ public class RPSLSp {
 
         countTally();
         System.out.println("The User won " + userWinsTally + timesVSTime(userWinsTally));
-        System.out.println("The Computer won " + compWinsTally + timesVSTime(compWinsTally)); // TODO: seperate time and times & add actual numbers corresponding to games
+        System.out.println("The Computer won " + compWinsTally + timesVSTime(compWinsTally)); 
         System.out.println("and they tied " + tieTally + timesVSTime(tieTally));
         System.out.println("\n Thank you for playing!");
 
