@@ -7,6 +7,7 @@ import java.io.*;
  * Author: Darrow Hartman
  */
 public class RPSLSp {
+    public static Random random = new Random(5); // * required random initializer
     public static Scanner sc;
     public static String battleFile = "./test-files/battles5.txt"; // or "./test-files/battles3.txt"
     public static int choicesLength;
@@ -59,8 +60,8 @@ public class RPSLSp {
      */
     public static void runManualGame(){
         int userSelection = askQuestion() - 1;// * -1 to convert to array entry 
-        Random rand = new Random();
-        int computerSelection = rand.nextInt(gameChoices.length);
+        // Random rand = new Random();
+        int computerSelection = random.nextInt(gameChoices.length);
         // * adds to user and comp weapon tallies
         userWeaponsTally[userSelection]++;
         compWeaponsTally[computerSelection]++;
@@ -83,8 +84,8 @@ public class RPSLSp {
         } else {
             currentVictor = "Tie";
             gameTally.add(0);
-
-            System.out.println("Neither the Computer ("+currentWeaponComp+") nor the User ("+ currentWeaponUser +") won -- tie.");
+            // User (paper) ties Computer (paper)
+            System.out.println("User ("+currentWeaponUser+") ties Computer ("+ currentWeaponComp +")");
         }
         playAgain();
     }
@@ -95,15 +96,15 @@ public class RPSLSp {
      */
     public static int askQuestion() {
 
-        String optionsPrompt = "Your Options:";
+        String optionsPrompt = "";
         for(int i = 0;i<gameChoices.length;i++){
-            optionsPrompt += "\n " + (i+1) + ". " + gameChoices[i];
+            optionsPrompt += "\n" + (i+1) + ". " + gameChoices[i];
         }
-        optionsPrompt += "\n Choose Your Weapon" + "(1-" + gameChoices.length + "):";
+        optionsPrompt += "\nChoose your weapon " + "(1-" + gameChoices.length + "): ";
 
-        System.out.println(optionsPrompt);
+        System.out.print(optionsPrompt);
         sc = new Scanner(System.in);
-        String numReturn = sc.nextLine();
+        String numReturn = sc.nextLine(); //.nextLine();
         try{
             int userVal = Integer.parseInt(numReturn);
             if ( 0 < userVal && userVal > gameChoices.length) {
@@ -126,7 +127,7 @@ public class RPSLSp {
      * Gives the user the option to start another battle
      */
     public static void playAgain() {
-        System.out.println("Battle again (yes/no)?");
+        System.out.print("Battle again (yes/no)? ");
         String willPlayAgain = sc.nextLine(); // will be y or n
         if (willPlayAgain.equals("y" )|| willPlayAgain.equals("yes" ) || willPlayAgain.equals("Y" ) ) {
             runManualGame();
@@ -270,10 +271,11 @@ public class RPSLSp {
             gamesAsString += gameChoices[i] + " ";
         }
         
-        System.out.println("\n");
+        // System.out.println("\n");
+        System.out.println("");
         System.out.println(gamesAsString);
         String compString = "Computer ";
-        String userString = "User     ";
+        String userString = "    User ";
         String divider = "         ";
 
         for (int i = 0; i < choicesLength; i++) {
@@ -290,10 +292,11 @@ public class RPSLSp {
         System.out.println(userString);
 
         countTally();
-        System.out.println("The User won " + userWinsTally + timesVSTime(userWinsTally));
-        System.out.println("The Computer won " + compWinsTally + timesVSTime(compWinsTally)); 
-        System.out.println("and they tied " + tieTally + timesVSTime(tieTally));
-        System.out.println("\n Thank you for playing!");
+        System.out.println("");
+
+        System.out.println("The computer won " + compWinsTally + timesVSTime(compWinsTally) + ","); 
+        System.out.println("the user won " + userWinsTally + timesVSTime(userWinsTally) + ",");
+        System.out.println("and they tied " + tieTally + timesVSTime(tieTally) + ".");
 
 
     }
@@ -304,7 +307,7 @@ public class RPSLSp {
      */
     public static String timesVSTime(int tally) {
         String timeOrTimes = "";
-        if (tally > 0) {
+        if (tally > 1) {
             timeOrTimes = " times";
         } else {
             timeOrTimes = " time";
@@ -333,7 +336,7 @@ public class RPSLSp {
             if (gameTally.get(i) == 1) {
                 // * user won
                 userWinsTally++;
-            }else if(gameTally.get(i) == -1){
+            } else if (gameTally.get(i) == -1) {
                 //* comp won
                 compWinsTally++;
             } else if (gameTally.get(i) == 0) {
@@ -342,5 +345,19 @@ public class RPSLSp {
             }
         }
     }
+    
+    // /**
+    //  * Runs code 12 times so I don't have to
+    //  */
+    // public static void automateTest(){
+    //     for (int i = 0; i < 12; i++) {
+    //         // * starting prompt
+    //         System.out.println("Welcome to Rock vs Paper vs Scissors vs Spock! By Darrow Hartman for CS-2&3 Review!");
+    //         // * get file input for how to run game
+    //         getFile(battleFile);
+    //         // * start game
+    //         runManualGame();
+    //     }
+    // }
 
 }
