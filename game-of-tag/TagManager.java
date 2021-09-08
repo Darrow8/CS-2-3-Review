@@ -1,14 +1,23 @@
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
 public class TagManager {
 
     // maintain 2 linked lists
     // a list of people currently untagged (tag ring)
+    public static LinkedList<TagNode> tagRing = new LinkedList<TagNode>();
     // a list of those who have already been tagged (the losers)
+    public static LinkedList<TagNode> theLosers = new LinkedList<TagNode>();
 
     // You may only have two fields in your TagManager object:
     // - a reference to the front node of the tag ring
     // - a reference to the front node of the losers (null if empty)
 
     public static void main(String[] args) {
+        // addTest();
+
+        // printTagRing();
 
     }
 
@@ -25,7 +34,35 @@ public class TagManager {
      * 
      * @param names
      */
-    public TagManager(List<String> names) {
+    public TagManager(List<String> names) throws IllegalArgumentException {
+
+        // * check for irregularities
+        if (names.size() == 0 || names == null || names.isEmpty() == true) {
+            throw new IllegalArgumentException("Size of names list in TagManager is 0 or null");
+        }
+
+        // * build tagRing
+        for (int i = 0; i < names.size(); i++) {
+            // System.out.println(i);
+            if (i == 0) {
+                TagNode firstNode = new TagNode(names.get(0));
+                tagRing.add(firstNode);
+            } else if (i != names.size() - 1) {
+                TagNode nextNode = new TagNode(names.get(i));
+                tagRing.get(i - 1).next = nextNode; // set prev one
+                tagRing.add(nextNode);
+
+            } else if (i == names.size() - 1) {
+                TagNode finalNode = new TagNode(names.get(i));
+                tagRing.get(i - 1).next = finalNode; // set prev one
+                finalNode.next = tagRing.get(0);
+                tagRing.add(finalNode);
+
+            }
+        }
+        // System.out.println(tagRingContains("Ruth Martin"));
+
+        // printTagRing();
     }
 
     /**
@@ -38,7 +75,13 @@ public class TagManager {
      * stalking Chris Chris is stalking Joe
      * 
      */
-    public void printTagRing() {
+    public static void printTagRing() {
+        // System.out.println("Current tag ring:");
+
+        for (int i = 0; i < tagRing.size(); i++) {
+            System.out.printf("  %s is stalking %s \n", tagRing.get(i).name, tagRing.get(i).next.name);
+        }
+
     }
 
     /**
@@ -53,15 +96,37 @@ public class TagManager {
      * Carol was tagged by Sally Chris was tagged by Carol Jim was tagged by Sally
      * 
      */
-    public void printLosers() {
+    public static void printLosers() {
+        // System.out.println("Current losers:");
+
+        for (int i = 0; i < theLosers.size(); i++) {
+            System.out.printf("  %s was tagged by %s \n", theLosers.get(i).name, theLosers.get(i).tagger);
+        }
     }
+
+    // ! just a note on tagRingContains() and losersContains()
+    // ! could easily be combined into only a contains()
+    // ! function taking the linkedList as a parameter.
 
     /**
      * In this method you should return true if the given name is in the current tag
      * ring and false otherwise. It should ignore case in comparing names; for
      * example, if passed "salLY", it should match a node with a name of "Sally".
      */
-    public boolean tagRingContains(String name) {
+    public static boolean tagRingContains(String name) {
+        String[] formattedNameArr = name.toString().split(" ");
+
+        String formattedName = formattedNameArr[0].substring(0, 1).toUpperCase()
+                + formattedNameArr[0].toLowerCase().substring(1) + " "
+                + formattedNameArr[1].substring(0, 1).toUpperCase() + formattedNameArr[1].toLowerCase().substring(1);
+
+        Iterator iter = tagRing.iterator();
+        while (iter.hasNext()) {
+            TagNode current = (TagNode) iter.next();
+            if (current.name.toString().contains(formattedName)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -73,7 +138,20 @@ public class TagManager {
      * @param name
      * @return
      */
-    public boolean losersContains(String name) {
+    public static boolean losersContains(String name) {
+        String[] formattedNameArr = name.toString().split(" ");
+
+        String formattedName = formattedNameArr[0].substring(0, 1).toUpperCase()
+                + formattedNameArr[0].toLowerCase().substring(1) + " "
+                + formattedNameArr[1].substring(0, 1).toUpperCase() + formattedNameArr[1].toLowerCase().substring(1);
+
+        Iterator iter = theLosers.iterator();
+        while (iter.hasNext()) {
+            TagNode current = (TagNode) iter.next();
+            if (current.name.toString().contains(formattedName)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -81,20 +159,28 @@ public class TagManager {
      * In this method you should return true if the game is over (i.e., if the tag
      * ring has just one person) and false otherwise.
      * 
-     * @return
+     * @return if game is over or not
      */
     public boolean isGameOver() {
-        return false;
+        if (tagRing.size() == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
      * In this method you should return the name of the winner of the game, or null
      * if the game is not over.
      * 
-     * @return
+     * @return name of winner or null
      */
     public String winner() {
-        return "hi";
+        if (isGameOver()) {
+            return tagRing.getFirst().name.toString();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -109,7 +195,67 @@ public class TagManager {
      * @param name
      */
     public void tag(String name) {
+        String[] formattedNameArr = name.toString().split(" ");
 
+        String formattedName = formattedNameArr[0].substring(0, 1).toUpperCase()
+                + formattedNameArr[0].toLowerCase().substring(1) + " "
+                + formattedNameArr[1].substring(0, 1).toUpperCase() + formattedNameArr[1].toLowerCase().substring(1);
+
+        if (tagRingContains(name) && !losersContains(name)) {
+
+            for (int i = 0; i < tagRing.size(); i++) {
+                // * converting name
+                if (tagRing.get(i).name.contains(formattedName)) {
+                    TagNode taggedNode = tagRing.get(i);
+                    // * tie up endings with next and tagger
+                    if (i == 0) {
+                        tagRing.get(tagRing.size() - 1).next = tagRing.get(1);
+                        taggedNode.tagger = tagRing.get(tagRing.size() - 1).name;
+                    } else if (i == tagRing.size() - 1) {
+                        tagRing.get(tagRing.size() - 2).next = tagRing.get(0);
+                        taggedNode.tagger = tagRing.get(tagRing.size() - 2).name;
+                    } else {
+                        tagRing.get(i - 1).next = tagRing.get(i + 1);
+                        taggedNode.tagger = tagRing.get(i - 1).name;
+                    }
+
+                    // * remove
+                    tagRing.remove(i);
+
+                    // * add to losers
+                    theLosers.addFirst(taggedNode);
+
+                }
+            }
+        } else {
+            System.out.println("error with tag() that should not occur -- likely problem with tagmain");
+        }
+
+    }
+
+    /**
+     * For adding test users to tag ring
+     */
+    public static void addTest() {
+
+        // * we love those j-names
+        TagNode jack = new TagNode("Jack");
+        TagNode jeremy = new TagNode("Jeremy");
+        TagNode jenny = new TagNode("Jenny");
+        TagNode jocelyn = new TagNode("Jocelyn");
+        TagNode john = new TagNode("John");
+
+        jack.next = jeremy;
+        jeremy.next = jenny;
+        jenny.next = jocelyn;
+        jocelyn.next = john;
+        john.next = jack;
+
+        tagRing.add(jack);
+        tagRing.add(jeremy);
+        tagRing.add(jocelyn);
+        tagRing.add(jenny);
+        tagRing.add(john);
     }
 
     /**
