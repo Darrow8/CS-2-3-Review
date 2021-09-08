@@ -161,7 +161,7 @@ public class TagManager {
      * 
      * @return if game is over or not
      */
-    public boolean isGameOver() {
+    public boolean isGameOver() throws IllegalStateException {
         if (tagRing.size() == 1) {
             return true;
         } else {
@@ -178,6 +178,7 @@ public class TagManager {
     public String winner() {
         if (isGameOver()) {
             return tagRing.getFirst().name.toString();
+            // throw new IllegalStateException("game is over");
         } else {
             return null;
         }
