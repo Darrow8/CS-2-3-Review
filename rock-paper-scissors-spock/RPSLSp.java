@@ -2,9 +2,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Created on September 3rd 2021.
- * Class: RPSLSp.java
- * Author: Darrow Hartman
+ * Created on September 3rd 2021. Class: RPSLSp.java Author: Darrow Hartman
  */
 public class RPSLSp {
     public static Random random = new Random(5); // * required random initializer
@@ -14,17 +12,15 @@ public class RPSLSp {
     public static String[] gameChoices = {}; // * the possible choices for the weapon to the user and computer
     public static int[][] gameOutcomes = {}; // * the results of the games overall
     public static String[][] gameVerbs = {}; // * the verbs that are used for each battle
-    public static ArrayList<Integer> gameTally = new ArrayList<Integer>(); // * the results of the games tallied (+1 for the user, -1 for the computer, and 0 for tie)
+    public static ArrayList<Integer> gameTally = new ArrayList<Integer>(); // * the results of the games tallied (+1 for
+                                                                           // the user, -1 for the computer, and 0 for
+                                                                           // tie)
     /**
-     * Example gameRules setup
-     * gameChoices = [rock,paper,scissors]
-     * gameRules = [
-     *      [0,0,1] rock beats scissors
-     *      [1,0,0] paper beats rock
-     *      [0,1,0] scissors beats paper
-     * ]
+     * Example gameRules setup gameChoices = [rock,paper,scissors] gameRules = [
+     * [0,0,1] rock beats scissors [1,0,0] paper beats rock [0,1,0] scissors beats
+     * paper ]
      */
-    public static int[][] gameRules = {}; // * the rules of the game that need to be defined using the battle files 
+    public static int[][] gameRules = {}; // * the rules of the game that need to be defined using the battle files
 
     // * current variables
     public static String currentWeaponUser = "";
@@ -38,12 +34,9 @@ public class RPSLSp {
     public static int[] userWeaponsTally = {};
     public static int[] compWeaponsTally = {};
 
-
-
-
-
     /**
-     * Starting function to initialize game, print introduction, and read battle file
+     * Starting function to initialize game, print introduction, and read battle
+     * file
      */
     public static void main(String[] args) throws IOException {
         // * starting prompt
@@ -53,13 +46,14 @@ public class RPSLSp {
         // * start game
         runManualGame();
     }
-    
+
     /**
-     * Runs a full round of the game and prompts the user to continue
-     * Note: This is a method to "play an individual battle" and should fulfill the requirement on necessary requirements
+     * Runs a full round of the game and prompts the user to continue Note: This is
+     * a method to "play an individual battle" and should fulfill the requirement on
+     * necessary requirements
      */
-    public static void runManualGame(){
-        int userSelection = askQuestion() - 1;// * -1 to convert to array entry 
+    public static void runManualGame() {
+        int userSelection = askQuestion() - 1;// * -1 to convert to array entry
         // Random rand = new Random();
         int computerSelection = random.nextInt(gameChoices.length);
         // * adds to user and comp weapon tallies
@@ -68,70 +62,72 @@ public class RPSLSp {
         // * selects current weapons
         currentWeaponComp = gameChoices[computerSelection];
         currentWeaponUser = gameChoices[userSelection];
-        
+
         if (gameRules[userSelection][computerSelection] == 1) {
             // * user has won
             currentVictor = "User";
             gameTally.add(1);
-            System.out.println("User (" + currentWeaponUser +") "+ gameVerbs[userSelection][computerSelection] +" Computer (" + currentWeaponComp +")");
+            System.out.println("User (" + currentWeaponUser + ") " + gameVerbs[userSelection][computerSelection]
+                    + " Computer (" + currentWeaponComp + ")");
         } else if (gameRules[computerSelection][userSelection] == 1) {
             // * computer has won
             currentVictor = "Computer";
             gameTally.add(-1);
 
-            System.out.println("Computer (" + currentWeaponComp +") "+ gameVerbs[computerSelection][userSelection] +" User (" + currentWeaponUser +")");
+            System.out.println("Computer (" + currentWeaponComp + ") " + gameVerbs[computerSelection][userSelection]
+                    + " User (" + currentWeaponUser + ")");
 
         } else {
             currentVictor = "Tie";
             gameTally.add(0);
             // User (paper) ties Computer (paper)
-            System.out.println("User ("+currentWeaponUser+") ties Computer ("+ currentWeaponComp +")");
+            System.out.println("User (" + currentWeaponUser + ") ties Computer (" + currentWeaponComp + ")");
         }
         playAgain();
     }
-    
+
     /**
      * Asks the user to enter 1-5 for their weapon choice
+     * 
      * @return int of what they chose
      */
     public static int askQuestion() {
 
         String optionsPrompt = "";
-        for(int i = 0;i<gameChoices.length;i++){
-            optionsPrompt += "\n" + (i+1) + ". " + gameChoices[i];
+        for (int i = 0; i < gameChoices.length; i++) {
+            optionsPrompt += "\n" + (i + 1) + ". " + gameChoices[i];
         }
         optionsPrompt += "\nChoose your weapon " + "(1-" + gameChoices.length + "): ";
 
         System.out.print(optionsPrompt);
         sc = new Scanner(System.in);
-        String numReturn = sc.nextLine(); //.nextLine();
-        try{
+        String numReturn = sc.nextLine(); // .nextLine();
+        try {
             int userVal = Integer.parseInt(numReturn);
-            if ( 0 < userVal && userVal > gameChoices.length) {
+            if (0 < userVal && userVal > gameChoices.length) {
                 // ! The user has entered a val outside the limits
-                throw new NumberFormatException("Error: your must enter a number 1-5, you entered a number greater than 5 or less than 1");
+                throw new NumberFormatException(
+                        "Error: your must enter a number 1-5, you entered a number greater than 5 or less than 1");
             }
             return userVal;
-        }
-        catch (NumberFormatException error) {
+        } catch (NumberFormatException error) {
             throw new NumberFormatException("Error: your must enter a number 1-5, you did not enter a number");
 
-        }
-        catch (Exception error) {
+        } catch (Exception error) {
             System.out.println(error);
-            throw new RuntimeException("Unkown Error");           
+            throw new RuntimeException("Unkown Error");
         }
     }
-    
+
     /**
      * Gives the user the option to start another battle
      */
     public static void playAgain() {
         System.out.print("Battle again (yes/no)? ");
         String willPlayAgain = sc.nextLine(); // will be y or n
-        if (willPlayAgain.equals("y" )|| willPlayAgain.equals("yes" ) || willPlayAgain.equals("Y" ) ) {
+        if (willPlayAgain.equals("y") || willPlayAgain.equals("yes") || willPlayAgain.equals("Y")) {
             runManualGame();
-        } else if (willPlayAgain.equals("n" )|| willPlayAgain.equals("no" ) || willPlayAgain.equals("N" ) ) {
+        } else if (willPlayAgain.equals("n") || willPlayAgain.equals("no") || willPlayAgain.equals("N")) {
             // * print out stats
             printTallyOutput();
         } else {
@@ -139,11 +135,9 @@ public class RPSLSp {
         }
     }
 
-
     /**
-     * Use `getFiles(file)` to get the data from a specific file
-     * filename - name of file ex: "file.txt"
-     * will prob use for the battles files
+     * Use `getFiles(file)` to get the data from a specific file filename - name of
+     * file ex: "file.txt" will prob use for the battles files
      */
     public static void getFile(String filename) {
         // * referenced: https://www.w3schools.com/java/java_files_read.asp
@@ -173,17 +167,19 @@ public class RPSLSp {
                 // * get values for gameChoices
                 String[] keywords = data.split(" ");
                 for (int i = 0; i < keywords.length; i++) {
-                    // * this for loop is sort of redundant because I could just set gameChoices to data.split() but this project encourages use of for loops
+                    // * this for loop is sort of redundant because I could just set gameChoices to
+                    // data.split() but this project encourages use of for loops
                     gameChoices[i] = keywords[i];
                 }
-                int choicesSq = choicesLength ^ 2; // * the number of possible outcomes is square the number of choices ex: rock, paper, scissors has 9
+                int choicesSq = choicesLength ^ 2; // * the number of possible outcomes is square the number of choices
+                                                   // ex: rock, paper, scissors has 9
                 gameRules = new int[choicesLength][choicesLength];
                 gameVerbs = new String[choicesLength][choicesLength];
             }
             if (lineCount != 1 && lineCount != 2) {
 
-                int lineShouldBe = choicesLength * choicesLength+ 2; // * length the file should be
-                if (lineCount > lineShouldBe) { 
+                int lineShouldBe = choicesLength * choicesLength + 2; // * length the file should be
+                if (lineCount > lineShouldBe) {
                     // ! error because of filesize
                     throw new Error("Error: There is something wrong with the file -- too long/short");
                 }
@@ -193,7 +189,6 @@ public class RPSLSp {
                 String ruleInit = ruleBase[0];
                 String[] ruleBattles = ruleBase[1].split(" ");
 
-                
                 // * converts names to ints for array positioning
                 int ruleInitVal = convertNametoNum(ruleInit);
 
@@ -218,7 +213,7 @@ public class RPSLSp {
                     }
                 } else if (ruleBattles.length == 2) {
                     // * this is a tie
-                    int ruleCorrespVal = convertNametoNum(ruleBattles[0]); //* ruleBattles[1] is tie
+                    int ruleCorrespVal = convertNametoNum(ruleBattles[0]); // * ruleBattles[1] is tie
                     gameVerbs[ruleInitVal][ruleCorrespVal] = "n/a"; // * verbs don't exist for ties
                     gameRules[ruleInitVal][ruleCorrespVal] = 0;
 
@@ -231,8 +226,7 @@ public class RPSLSp {
         }
         sc.close();
     }
-    
-    
+
     /**
      * Converts the name of a weapon into a number corresponding to it
      */
@@ -241,28 +235,32 @@ public class RPSLSp {
         int retval = -1;
         for (int i = 0; i < gameChoices.length; i++) {
             String gc = gameChoices[i].replaceAll("\\s", "");
-            // * was having issues with if statement name equal gc, thought there was something wrong with my compiler until I found this: https://stackoverflow.com/questions/14696054/while-loop-in-java-string-comparison-does-not-work
+            // * was having issues with if statement name equal gc, thought there was
+            // something wrong with my compiler until I found this:
+            // https://stackoverflow.com/questions/14696054/while-loop-in-java-string-comparison-does-not-work
             if (new String(name).equals(gc)) {
-                retval =  i;
+                retval = i;
             }
 
         }
 
         return retval;
     }
-    
+
     /**
-     * Uses special format for tally given in assignement pdf
-     * Note: This "prints the statistics" and should fulfill the requirement on necessary requirements
+     * Uses special format for tally given in assignement pdf Note: This "prints the
+     * statistics" and should fulfill the requirement on necessary requirements
      */
     public static void printTallyOutput() {
-        // ! I was trying to get the template code for the prints to work but I kept having problems so I did it myself
-        // System.out.printf("         %8s %8s %8s %8s %8s\n","rock"/*, "rock”, "paper", …*/);       
-        // System.out.println("         -------- -------- -------- -------- --------");
-        // System.out.printf("%8s %8d %8d %8d %8d %8d\n","Computer"/*, “Computer”, ...*/);
+        // ! I was trying to get the template code for the prints to work but I kept
+        // having problems so I did it myself
+        // System.out.printf(" %8s %8s %8s %8s %8s\n","rock"/*, "rock”, "paper", …*/);
+        // System.out.println(" -------- -------- -------- -------- --------");
+        // System.out.printf("%8s %8d %8d %8d %8d %8d\n","Computer"/*, “Computer”,
+        // ...*/);
         // System.out.printf("%8s %8d %8d %8d %8d %8d\n", "User"/*, “User”, ...*/);
         String gamesAsString = "         ";
-        int totalChrs = 8; //* total num of chars required
+        int totalChrs = 8; // * total num of chars required
         for (int i = 0; i < gameChoices.length; i++) {
             int remainingChrs = totalChrs - gameChoices[i].length();
             for (int j = 0; j < remainingChrs; j++) {
@@ -270,7 +268,7 @@ public class RPSLSp {
             }
             gamesAsString += gameChoices[i] + " ";
         }
-        
+
         // System.out.println("\n");
         System.out.println("");
         System.out.println(gamesAsString);
@@ -280,7 +278,7 @@ public class RPSLSp {
 
         for (int i = 0; i < choicesLength; i++) {
             divider += "-------- ";
-            //!if over 9 then there will be issues with formatting
+            // !if over 9 then there will be issues with formatting
             compString += "       " + compWeaponsTally[i] + " ";
             userString += "       " + userWeaponsTally[i] + " ";
 
@@ -294,15 +292,15 @@ public class RPSLSp {
         countTally();
         System.out.println("");
 
-        System.out.println("The computer won " + compWinsTally + timesVSTime(compWinsTally) + ","); 
+        System.out.println("The computer won " + compWinsTally + timesVSTime(compWinsTally) + ",");
         System.out.println("the user won " + userWinsTally + timesVSTime(userWinsTally) + ",");
         System.out.println("and they tied " + tieTally + timesVSTime(tieTally) + ".");
-
 
     }
 
     /**
      * Determine if it should be time or times based on tally
+     * 
      * @return time or times as strings
      */
     public static String timesVSTime(int tally) {
@@ -329,7 +327,8 @@ public class RPSLSp {
     }
 
     /**
-     * count up tally from gameTally into number of wins for each group (user, comp, and tie)
+     * count up tally from gameTally into number of wins for each group (user, comp,
+     * and tie)
      */
     public static void countTally() {
         for (int i = 0; i < gameTally.size(); i++) {
@@ -337,7 +336,7 @@ public class RPSLSp {
                 // * user won
                 userWinsTally++;
             } else if (gameTally.get(i) == -1) {
-                //* comp won
+                // * comp won
                 compWinsTally++;
             } else if (gameTally.get(i) == 0) {
                 // * it was a tie
@@ -345,19 +344,20 @@ public class RPSLSp {
             }
         }
     }
-    
+
     // /**
-    //  * Runs code 12 times so I don't have to
-    //  */
+    // * Runs code 12 times so I don't have to
+    // */
     // public static void automateTest(){
-    //     for (int i = 0; i < 12; i++) {
-    //         // * starting prompt
-    //         System.out.println("Welcome to Rock vs Paper vs Scissors vs Spock! By Darrow Hartman for CS-2&3 Review!");
-    //         // * get file input for how to run game
-    //         getFile(battleFile);
-    //         // * start game
-    //         runManualGame();
-    //     }
+    // for (int i = 0; i < 12; i++) {
+    // // * starting prompt
+    // System.out.println("Welcome to Rock vs Paper vs Scissors vs Spock! By Darrow
+    // Hartman for CS-2&3 Review!");
+    // // * get file input for how to run game
+    // getFile(battleFile);
+    // // * start game
+    // runManualGame();
+    // }
     // }
 
 }
