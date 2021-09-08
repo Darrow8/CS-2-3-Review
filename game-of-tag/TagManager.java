@@ -194,7 +194,11 @@ public class TagManager {
      * 
      * @param name
      */
-    public void tag(String name) {
+    public void tag(String name) throws IllegalArgumentException {
+        if (name == "" || name == null) {
+            throw new IllegalArgumentException("The name inputted by the user has problems, please restart.");
+        }
+
         String[] formattedNameArr = name.toString().split(" ");
 
         String formattedName = formattedNameArr[0].substring(0, 1).toUpperCase()
